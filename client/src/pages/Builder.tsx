@@ -587,6 +587,20 @@ export const Editable = {
       setSteps(prev => prev.map((s: Step) =>
         processedIds.has(s.id) ? { ...s, status: "completed" } : s
       ));
+
+      // Auto-save to DB so ProjectDetails can load the latest files
+      if (templateSet && PROJECTID) {
+        console.log("[FileUpdate] Auto-saving generated files to DB...");
+        (async () => {
+          try {
+            await deleteAllFiles(PROJECTID);
+            await uploadFiles([...originalFiles], PROJECTID);
+            console.log("[FileUpdate] Auto-save complete.");
+          } catch (err) {
+            console.error("[FileUpdate] Auto-save failed:", err);
+          }
+        })();
+      }
     }
 
     console.log("files are: ", files);
