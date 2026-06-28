@@ -143,6 +143,7 @@ I am **very particular about my project's file structure**. You **must not modif
 - Do **not** install any additional UI libraries, themes, or icon packs unless explicitly requested.
 - Use **stock photos from Unsplash**, linking only valid URLs inside \`<img>\` tags. Do **not** download or embed images.
 - The AI **must adhere strictly** to the provided file structure, making modifications **only** in \`App.js\` and \`App.css\`.
+- **CRITICAL**: ONLY include files that you have modified (e.g. \`App.js\` and \`App.css\`) in your \`<genwebAction>\` output. Do NOT output unmodified files like \`package.json\`, \`index.html\`, or \`tailwind.config.js\`.
 
 ### File Structure (Do Not Alter Except \`App.js\` & \`App.css\`):
 

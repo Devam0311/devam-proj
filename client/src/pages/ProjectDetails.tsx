@@ -679,12 +679,13 @@ const ProjectPage: React.FC = () => {
 
           <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(94vh-8rem)] w-[calc(70vw)]">
             <TabView activeTab={activeTab} onTabChange={setActiveTab} />
-            <div className="h-[calc(100%-4rem)] ">
-              {activeTab === 'code' ? (
+            <div className="h-[calc(100%-4rem)] relative">
+              <div className={activeTab === 'code' ? "h-full block" : "hidden"}>
                 <CodeEditor file={selectedFile} />
-              ) : (
+              </div>
+              <div className={activeTab === 'preview' ? "h-full block" : "hidden"}>
                 <PreviewFrame webContainer={webcontainer} files={structuredFiles} />
-              )}
+              </div>
             </div>
           </div>
         </div>
