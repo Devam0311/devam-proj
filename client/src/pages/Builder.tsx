@@ -515,17 +515,29 @@ export const Editable = {
   console.log("Updated config.js content:", files.find(f => f.name === "src")?.children?.find(f => f.name === "config.js")?.content);
 
 
+  // Deep clone helper to avoid mutating state references directly
+  const deepCloneFiles = (items: FileItem[]): FileItem[] => {
+    return items.map(item => ({
+      ...item,
+      children: item.children ? deepCloneFiles(item.children) : undefined,
+    }));
+  };
+
   //Folder Structure handled 
   useEffect(() => {
-    let originalFiles = [...files];
+    const pendingSteps = steps.filter(({ status }) => status === "pending");
+    if (pendingSteps.length === 0) return;
+
+    // Deep clone so we never mutate existing state references
+    let originalFiles = deepCloneFiles(files);
     let updateHappened = false;
 
-    steps.filter(({ status }) => status === "pending").map(step => {
-      updateHappened = true;
+    pendingSteps.forEach(step => {
       if (step?.type === StepType.CreateFile) {
-        let parsedPath = step.path?.split("/") ?? []; // ["src", "components", "App.tsx"]
-        let currentFileStructure = [...originalFiles]; // {}
-        const finalAnswerRef = currentFileStructure;
+        updateHappened = true;
+        let parsedPath = step.path?.split("/") ?? [];
+        let currentFileStructure = originalFiles;
+        const finalAnswerRef = originalFiles;
 
         let currentFolder = "";
 
@@ -536,53 +548,51 @@ export const Editable = {
 
           if (!parsedPath.length) {
             // final file
-            const file = currentFileStructure.find(x => x.path === currentFolder)
+            const file = currentFileStructure.find(x => x.path === currentFolder);
             if (!file) {
               currentFileStructure.push({
                 name: currentFolderName,
                 type: 'file',
                 path: currentFolder,
                 content: step.code
-              })
+              });
             } else {
               file.content = step.code;
             }
           } else {
-            /// in a folder
-            const folder = currentFileStructure.find(x => x.path === currentFolder)
+            // in a folder
+            let folder = currentFileStructure.find(x => x.path === currentFolder);
             if (!folder) {
-              // create the folder
-              currentFileStructure.push({
+              folder = {
                 name: currentFolderName,
                 type: 'folder',
                 path: currentFolder,
                 children: []
-              })
+              };
+              currentFileStructure.push(folder);
             }
-
-            currentFileStructure = currentFileStructure.find(x => x.path === currentFolder)!.children!;
+            if (!folder.children) folder.children = [];
+            currentFileStructure = folder.children;
           }
         }
         originalFiles = finalAnswerRef;
       }
-
-    })
+    });
 
     if (updateHappened) {
-
-      setFiles(originalFiles)
-      setSteps(steps => steps.map((s: Step) => {
-        return {
-          ...s,
-          status: "completed"
-        }
-
-      }))
+      console.log("[FileUpdate] Setting files:", originalFiles);
+      setFiles([...originalFiles]);
+      // Only mark the processed steps as completed
+      const processedIds = new Set(pendingSteps.map(s => s.id));
+      setSteps(prev => prev.map((s: Step) =>
+        processedIds.has(s.id) ? { ...s, status: "completed" } : s
+      ));
     }
+
     console.log("files are: ", files);
     console.log("steps are: ", steps);
 
-  }, [steps, files]);
+  }, [steps]);
 
 
   useEffect(() => {
