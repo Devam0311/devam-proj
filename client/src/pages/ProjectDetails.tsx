@@ -236,7 +236,7 @@ const ProjectPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://product-dev-kriti-25.onrender.com/api/v1/project/get-style?projectId=${projectId}`,
+        `https://devam-proj.onrender.com/api/v1/project/get-style?projectId=${projectId}`,
         {
           method: "GET",
           headers: {

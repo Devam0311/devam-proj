@@ -16,7 +16,8 @@ export default defineConfig({
     port: process.env.PORT ? Number(process.env.PORT) : 5173, // Use Render's dynamic PORT environment variable, fallback to 5173 if not available
     allowedHosts: [
       'localhost',
-      'product-dev-kriti-25-front-end.onrender.com' // Allow your Render deployment
+      'devam-proj.vercel.app', // Allow your Vercel deployment
+      'devam-proj.onrender.com'
     ],
   },
   define: {

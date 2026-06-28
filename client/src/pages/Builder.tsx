@@ -496,7 +496,7 @@ export const Editable = {
                     ...file,
                     content: `
                         export const PROJECTID = "${projectData._id}"; 
-                        export const BACKEND_URL = "https://product-dev-kriti-25.onrender.com/api/v1";
+                        export const BACKEND_URL = "https://devam-proj.onrender.com/api/v1";
                       `
                   }
                   : file
@@ -782,7 +782,7 @@ export const Editable = {
 
     try {
       const response = await fetch(
-        `https://product-dev-kriti-25.onrender.com/api/v1/project/get-style?projectId=${PROJECTID}`,
+        `https://devam-proj.onrender.com/api/v1/project/get-style?projectId=${PROJECTID}`,
         {
           method: "GET",
           headers: {

@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const backendUrl = BACKEND_URL || "https://product-dev-kriti-25.onrender.com";
+  const backendUrl = BACKEND_URL || "https://devam-proj.onrender.com";
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
