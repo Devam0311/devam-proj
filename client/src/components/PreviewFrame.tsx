@@ -21,12 +21,15 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
       });
 
       console.log("Starting npm install...");
-      const installProcess = await webContainer.spawn('npm', ['install']);
+      const installProcess = await webContainer.spawn('npm', ['install', '--no-progress', '--loglevel=error']);
 
-      // Capture install output
+      // Capture install output but avoid logging raw terminal control sequences
       installProcess.output.pipeTo(new WritableStream({
         write(data) {
-          console.log(data);
+          // Only log meaningful text, filter out progress bar spinners and clear codes
+          if (data.length > 5 && !data.includes('[1G') && !data.includes('[0K')) {
+            console.log(data.trim());
+          }
         }
       }));
 
