@@ -12,7 +12,6 @@ import { exec } from "child_process";
 import cors from "cors";
 dotenv.config();
 import connectToDb from "./config/db_config.js";
-import OpenAI from "openai";
 import cookieParser from "cookie-parser";
 const app = express();
 const port = 5001;
@@ -36,28 +35,6 @@ app.use(cookieParser());
 app.use(express.json());
 
 ////////////
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
-async function main() {
-    try {
-        const chatCompletion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: "You are a helpful assistant." },
-                { role: "user", content: "Can you explain what artificial intelligence is and tell me a bit about space?" },
-            ],
-        });
-
-        console.log(chatCompletion.choices[0].message.content);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}
-
-// main();
 
 ////////////
 
