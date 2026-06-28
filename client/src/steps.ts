@@ -93,11 +93,8 @@ export function parseXml(response: string, startId: number = 1): Step[] {
   // Extract the XML content between <genwebArtifact> tags
   const xmlMatch = response.match(/<genwebArtifact[^>]*>([\s\S]*?)<\/genwebArtifact>/);
   
-  if (!xmlMatch) {
-      return [];
-  }
+  const xmlContent = xmlMatch ? xmlMatch[1] : response;
 
-  const xmlContent = xmlMatch[1];
   const steps: Step[] = [];
   let stepId = startId;
 
@@ -114,12 +111,19 @@ export function parseXml(response: string, startId: number = 1): Step[] {
       status: 'pending'
   });
 
-  // Regular expression to find genwebAction elements
-  const actionRegex = /<genwebAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/genwebAction>/g;
+  // Regular expression to find genwebAction elements robustly
+  const actionRegex = /<genwebAction([^>]*)>([\s\S]*?)<\/genwebAction>/g;
 
   let match;
   while ((match = actionRegex.exec(xmlContent)) !== null) {
-      const [, type, filePath, content] = match;
+      const attributes = match[1];
+      const content = match[2];
+
+      const typeMatch = attributes.match(/type=["']([^"']*)["']/);
+      const fileMatch = attributes.match(/filePath=["']([^"']*)["']/);
+      
+      const type = typeMatch ? typeMatch[1] : null;
+      const filePath = fileMatch ? fileMatch[1] : null;
 
       if (type === 'file') {
           // File creation step
