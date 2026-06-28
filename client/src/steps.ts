@@ -90,16 +90,26 @@ import { Step, StepType } from './types/index';
 //   }
 
 export function parseXml(response: string, startId: number = 1): Step[] {
+  console.log("[parseXml] Input length:", response.length);
+
+  // Normalize: replace boltArtifact/boltAction with genwebArtifact/genwebAction
+  let normalized = response
+    .replace(/<boltArtifact/g, '<genwebArtifact')
+    .replace(/<\/boltArtifact>/g, '</genwebArtifact>')
+    .replace(/<boltAction/g, '<genwebAction')
+    .replace(/<\/boltAction>/g, '</genwebAction>');
+
   // Extract the XML content between <genwebArtifact> tags
-  const xmlMatch = response.match(/<genwebArtifact[^>]*>([\s\S]*?)<\/genwebArtifact>/);
+  const xmlMatch = normalized.match(/<genwebArtifact[^>]*>([\s\S]*?)<\/genwebArtifact>/);
   
-  const xmlContent = xmlMatch ? xmlMatch[1] : response;
+  const xmlContent = xmlMatch ? xmlMatch[1] : normalized;
+  console.log("[parseXml] Found artifact wrapper:", !!xmlMatch);
 
   const steps: Step[] = [];
   let stepId = startId;
 
   // Extract artifact title
-  const titleMatch = response.match(/title="([^"]*)"/);
+  const titleMatch = normalized.match(/title=["']([^"']*)["']/);
   const artifactTitle = titleMatch ? titleMatch[1] : 'Project Files';
 
   // Add initial artifact step
@@ -149,5 +159,6 @@ export function parseXml(response: string, startId: number = 1): Step[] {
       }
   }
 
+  console.log("[parseXml] Total steps parsed:", steps.length);
   return steps;
 }

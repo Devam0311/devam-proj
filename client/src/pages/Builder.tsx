@@ -677,7 +677,7 @@ export const Editable = {
     setMessage("Fetched response successfully..");
 
 
-    const cleanedResponse = stepsResponse.data.response.replace(/```[a-zA-Z]*/g, "");
+    const cleanedResponse = stepsResponse.data.response.replace(/```[a-zA-Z]*/g, "").replace(/```/g, "");
 
 
     console.log("steps response is: ", cleanedResponse);
@@ -695,6 +695,8 @@ export const Editable = {
     setSteps((prevSteps) => {
       const lastStepId = prevSteps.length > 0 ? Math.max(...prevSteps.map(step => step.id)) : 0;
       const newSteps = parseXml(cleanedResponse, lastStepId + 1);
+      console.log("[DEBUG] parseXml returned", newSteps.length, "steps from chat response");
+      console.log("[DEBUG] parsed steps:", JSON.stringify(newSteps.map(s => ({ title: s.title, type: s.type, path: s.path }))));
       return [...prevSteps, ...newSteps.map(x => ({
         ...x,
         status: "pending" as "pending"

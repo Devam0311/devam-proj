@@ -132,25 +132,24 @@ app.post("/api/v1/chat/", async (req, res) => {
 
     // Extract the content from each message and combine them
     const combinedPrompt = messages.map(msg => msg.content).join("\n") + "\n\n" +
-        "You should respond in the below format only, and do NOT add any extra text, " +
-        "explanations, or code blocks like ``javascript. Just return the content exactly as requested:\n\n " +
-        `Here is an artifact that contains all files of the project visible to you.
-  Consider the contents of ALL files in the project.
-  
-  <genwebArtifact id="project-import" title="Project Files">
-  
-  <genwebAction type="file" filePath="public/index.html">
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <title>React App</title>
-    </head>
-    <body>
-      <div id="root"></div>
-    </body>
-  </html>
-  </genwebAction>
-  </genwebArtifact>`;
+        "CRITICAL INSTRUCTIONS FOR YOUR RESPONSE FORMAT:\n" +
+        "1. You MUST respond using ONLY the XML format shown below. Do NOT wrap your response in markdown code blocks (no ``` at all).\n" +
+        "2. Do NOT add any extra text, explanations, or commentary outside the XML tags.\n" +
+        "3. You MUST use exactly these tag names: <genwebArtifact> and <genwebAction>. Do NOT use boltArtifact, boltAction, or any other tag names.\n" +
+        "4. Every file MUST be wrapped in a <genwebAction type=\"file\" filePath=\"...\"> tag.\n" +
+        "5. You MUST include ALL project files (App.js, App.css, and any other files you create) in the response.\n\n" +
+        "Here is the exact format you must follow:\n\n" +
+        `<genwebArtifact id="project-import" title="Project Files">
+
+<genwebAction type="file" filePath="src/App.js">
+// Your App.js code here
+</genwebAction>
+
+<genwebAction type="file" filePath="src/App.css">
+/* Your App.css code here */
+</genwebAction>
+
+</genwebArtifact>`;
 
     try {
         const result = await geminiModel.generateContent(combinedPrompt);
