@@ -14,6 +14,12 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
 
   async function main() {
     try {
+      // Register server-ready listener BEFORE spawning to avoid race condition
+      webContainer.on('server-ready', (port, url) => {
+        console.log("Server ready at:", url);
+        setUrl(url);
+      });
+
       console.log("Starting npm install...");
       const installProcess = await webContainer.spawn('npm', ['install']);
 
@@ -24,17 +30,24 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
         }
       }));
 
-      await installProcess.exit; // Ensure install completes before starting the server
-      console.log("npm install completed, starting server...");
+      const exitCode = await installProcess.exit;
+      console.log("npm install completed with exit code:", exitCode);
 
+      if (exitCode !== 0) {
+        console.error("npm install failed with exit code:", exitCode);
+        return;
+      }
+
+      console.log("Starting dev server...");
       const startProcess = await webContainer.spawn('npm', ['start']);
-      setRunningProcess(startProcess); // Store reference to terminate later
+      setRunningProcess(startProcess);
 
-      // Capture server URL
-      webContainer.on('server-ready', (port, url) => {
-        console.log("Server ready at:", url);
-        setUrl(url);
-      });
+      // Capture server output for debugging
+      startProcess.output.pipeTo(new WritableStream({
+        write(data) {
+          console.log("[server]", data);
+        }
+      }));
     } catch (error) {
       console.error("Error in web container:", error);
     }
