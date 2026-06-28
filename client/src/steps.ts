@@ -129,8 +129,8 @@ export function parseXml(response: string, startId: number = 1): Step[] {
       const attributes = match[1];
       const content = match[2];
 
-      const typeMatch = attributes.match(/type=["']([^"']*)["']/);
-      const fileMatch = attributes.match(/filePath=["']([^"']*)["']/);
+      const typeMatch = attributes.match(/type\s*=\s*["']([^"']*)["']/);
+      const fileMatch = attributes.match(/filePath\s*=\s*["']([^"']*)["']/);
       
       const type = typeMatch ? typeMatch[1] : null;
       const filePath = fileMatch ? fileMatch[1] : null;
