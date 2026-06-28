@@ -92,15 +92,15 @@ import { Step, StepType } from './types/index';
 export function parseXml(response: string, startId: number = 1): Step[] {
   console.log("[parseXml] Input length:", response.length);
 
-  // Normalize: replace boltArtifact/boltAction with genwebArtifact/genwebAction
+  // Normalize: replace boltArtifact/boltAction with genwebArtifact/genwebAction case-insensitively
   let normalized = response
-    .replace(/<boltArtifact/g, '<genwebArtifact')
-    .replace(/<\/boltArtifact>/g, '</genwebArtifact>')
-    .replace(/<boltAction/g, '<genwebAction')
-    .replace(/<\/boltAction>/g, '</genwebAction>');
+    .replace(/<boltArtifact/gi, '<genwebArtifact')
+    .replace(/<\/boltArtifact>/gi, '</genwebArtifact>')
+    .replace(/<boltAction/gi, '<genwebAction')
+    .replace(/<\/boltAction>/gi, '</genwebAction>');
 
   // Extract the XML content between <genwebArtifact> tags
-  const xmlMatch = normalized.match(/<genwebArtifact[^>]*>([\s\S]*?)<\/genwebArtifact>/);
+  const xmlMatch = normalized.match(/<genwebArtifact[^>]*>([\s\S]*?)<\/genwebArtifact>/i);
   
   const xmlContent = xmlMatch ? xmlMatch[1] : normalized;
   console.log("[parseXml] Found artifact wrapper:", !!xmlMatch);
@@ -121,8 +121,8 @@ export function parseXml(response: string, startId: number = 1): Step[] {
       status: 'pending'
   });
 
-  // Regular expression to find genwebAction elements robustly
-  const actionRegex = /<genwebAction([^>]*)>([\s\S]*?)<\/genwebAction>/g;
+  // Regular expression to find genwebAction elements robustly, case-insensitive
+  const actionRegex = /<genwebAction([^>]*)>([\s\S]*?)<\/genwebAction>/gi;
 
   let match;
   while ((match = actionRegex.exec(xmlContent)) !== null) {
